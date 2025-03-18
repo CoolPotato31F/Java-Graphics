@@ -9,11 +9,11 @@ import java.awt.Graphics2D;
  * Represents a polygon that can be drawn and manipulated in a graphical window.
  */
 public class Polygon implements GraphicsObject {
-    private Point[] points;
-    private int width = 10; // Default stroke width
-    private GraphWin canvas;
-    private Color fillColor;
-    private Color outlineColor = Color.BLACK;
+    protected Point[] points;
+    protected int width = 10; // Default stroke width
+    protected GraphWin canvas;
+    protected Color fillColor;
+    protected Color outlineColor = Color.BLACK;
 
     /**
      * Constructs a Polygon from an array of points.
@@ -53,7 +53,16 @@ public class Polygon implements GraphicsObject {
         }
         return yCoords;
     }
-
+    
+    /**
+     * Gets every point in the polygon
+     * 
+     * @return An array of every Points
+     */
+    public Point[] getPoints() {
+    	return points;
+    }
+    
     /**
      * Sets the fill color of the rectangle.
      * 
