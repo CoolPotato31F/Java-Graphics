@@ -21,6 +21,16 @@ import java.util.concurrent.CountDownLatch;
  * Represents a graphical window where graphical objects can be drawn and interacted with.
  * Provides methods to add, remove, and update graphical objects like shapes, text, and images.
  * Supports mouse and keyboard input for interactive applications.
+ * 
+ * All versions below are implemented unless explicitly stated in a above version.
+ * 
+ * |================= Version 0.0.2 =================|
+ * Added RotatablePolygon to the library.
+ * The RotatablePolygon is castable to a Polygon which will just make it a
+ * standard polygon with no ability to rotate.
+ * |================= Version 0.0.1 =================|
+ * Most simple version with just basic shapes and uses for those shape. 
+ * Very simple structure and all shapes are easily changed to adjust apperance
  */
 
 public class GraphWin extends JFrame {
@@ -51,6 +61,7 @@ public class GraphWin extends JFrame {
     private double deltaTime = 0;
     private long lastTime;
     private int lastKey = -1;
+    public boolean redraw = false;
     private final ArrayList<Integer> keysPressed = new ArrayList<Integer>();
 
     /**
@@ -61,7 +72,7 @@ public class GraphWin extends JFrame {
      */
     public static void main(String[] args) throws InterruptedException {
         // Window setup and example usage code
-        GraphWin window = new GraphWin(500, 500, "Testing", false);
+        GraphWin window = new GraphWin("Testing", 500, 500, false);
 
         // Example of drawing graphical objects
         Point point = new Point(100, 100);
@@ -75,7 +86,6 @@ public class GraphWin extends JFrame {
         Filter filter = new Filter(0.1f, 1f, 0f);
         Image image = new Image(new Point(450, 420), GraphWin.class.getResource("TestImage.jpg"));
         image.setScale(0.15);
-        image.applyFilter(filter);
         image.draw(window);
 
         window.update();
@@ -88,12 +98,12 @@ public class GraphWin extends JFrame {
     /**
      * Constructs a GraphWin window with a specified width, height, title, and autoflush setting.
      * 
+     * @param Name the title of the window
      * @param w the width of the window
      * @param h the height of the window
-     * @param Name the title of the window
      * @param Autoflush whether the window should automatically flush and repaint
      */
-    public GraphWin(int w, int h, String Name, boolean Autoflush) {
+    public GraphWin(String Name, int w, int h, boolean Autoflush) {
         super(Name);
         items = new ArrayList<GraphicsObject>();
         width = w;
@@ -105,7 +115,6 @@ public class GraphWin extends JFrame {
         setSize(preferedX + w, preferedY + h);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        System.out.println("panel");
         this.panel = new Panel();
         this.panel.setPreferredSize(new Dimension(width, height));
         add(this.panel);
@@ -171,7 +180,6 @@ public class GraphWin extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         panel = new Panel();
         panel.setPreferredSize(new Dimension(width, height));
-        System.out.println(panel);
         add(panel);
 
         latch = new CountDownLatch(1);
@@ -215,7 +223,7 @@ public class GraphWin extends JFrame {
     /**
      * Inner class to represent the panel within the window that handles rendering graphical objects.
      */
-    public class Panel extends JPanel {
+    private class Panel extends JPanel {
         /**
 		 * 
 		 */
@@ -228,6 +236,7 @@ public class GraphWin extends JFrame {
 
         @Override
         protected void paintComponent(Graphics g) {
+        	if (!redraw) {return;}
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
             for (int i = 0; i < items.size(); i++) {
@@ -299,21 +308,36 @@ public class GraphWin extends JFrame {
         return mousePosition;
     }
 
+    /**
+     * @return the current width of the GraphWin object
+     */
     @Override
     public int getWidth() {
         return width;
     }
 
+    /**
+     * @return the current height of the GraphWin object
+     */
     @Override
     public int getHeight() {
         return height;
     }
-    
+    /**
+     * Sets the background of the GraphWin
+     * 
+     * @param clr the color to set the Background
+     */
     @Override
     public void setBackground(Color clr) {
+    	// Forces the background to also call the panel set Background
     	if (this.panel != null) {
+    		super.setBackground(clr);
         	this.panel.setBackground(clr);
-    	} else {
+        	if (autoflush) {
+        		update();
+        	}
+    	} else { // Forced to do this because this function gets called on GraphWin initialization
     		super.setBackground(clr);
     	}
     }
@@ -340,6 +364,7 @@ public class GraphWin extends JFrame {
      * Updates the window by calculating delta time and forcing a repaint.
      */
     public void update() {
+    	redraw = true;
         if (lastTime == 0) {
             lastTime = System.nanoTime();
         }
@@ -347,6 +372,7 @@ public class GraphWin extends JFrame {
         lastTime = System.nanoTime();
         panel.paintImmediately(0, 0, panel.getWidth(), panel.getHeight());
         Toolkit.getDefaultToolkit().sync();
+    	redraw = false;
     }
 
     /**
