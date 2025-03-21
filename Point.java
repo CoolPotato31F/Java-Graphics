@@ -56,7 +56,18 @@ public class Point implements GraphicsObject {
         x += dx;
         y += dy;
     }
-
+    
+    /**
+     * Moves to the specified point.
+     * 
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     */
+    public void moveTo(double x, double y) {
+    	this.x = x;
+    	this.y = y;
+    }
+    
     /**
      * Sets the width (size) of the point when drawn.
      * 
