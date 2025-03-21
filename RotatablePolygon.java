@@ -59,7 +59,7 @@ public class RotatablePolygon extends Polygon{
             double newX = x * cosTheta - y * sinTheta + center.getX();
             double newY = x * sinTheta + y * cosTheta + center.getY();
 
-            points[i].setLocation(newX, newY); // Use setLocation and round
+            points[i].moveTo(newX, newY); // Use setLocation and round
         }
     }
 
