@@ -145,6 +145,7 @@ public class GraphWin extends JFrame {
             poly.rotate(100 * window.getDeltaTime());
             poly.getCenter().draw(window);
             image.rotate(100 * window.getDeltaTime());
+            window.setTitle("FPS: "+Math.round(1/window.getDeltaTime()));
             window.update();
         }
 
@@ -427,7 +428,7 @@ public class GraphWin extends JFrame {
         }
         deltaTime = (System.nanoTime() - lastTime) / 1_000_000_000.0;
         lastTime = System.nanoTime();
-        panel.paintImmediately(0, 0, panel.getWidth(), panel.getHeight());
+        panel.repaint();
         Toolkit.getDefaultToolkit().sync();
     	redraw = false;
     }
