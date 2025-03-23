@@ -10,6 +10,7 @@ public class RotatablePolygon extends Polygon{
     public RotatablePolygon(Point[] p) {
         super(p);  // Call the superclass constructor (Polygon)
         this.originalPoints = deepCopy(p);
+        this.points = deepCopy(p);
         center = findCentroid();
     }
 
@@ -68,15 +69,6 @@ public class RotatablePolygon extends Polygon{
     }
 
     @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder("RotatablePolygon(");
-        for (Point p : points) {
-            str.append(p.toString()).append(", ");
-        }
-        return str.append(")").toString();
-    }
-
-    @Override
     public void drawPanel(Graphics2D graphics) {
         int[] xCoords = getXCords();
         int[] yCoords = getYCords();
@@ -89,5 +81,29 @@ public class RotatablePolygon extends Polygon{
         graphics.setStroke(new BasicStroke(width));
         graphics.setColor(outlineColor);
         graphics.drawPolygon(xCoords, yCoords, points.length);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder("RotatablePolygon(");
+        
+        // Add information about the current points of the polygon
+        str.append("Points=[");
+        for (Point p : points) {
+            str.append(p.toString()).append(", ");
+        }
+        // Remove the last comma and space
+        if (points.length > 0) {
+            str.setLength(str.length() - 2);
+        }
+        str.append("], ");
+        
+        // Add center point
+        str.append("Center=").append(center.toString()).append(", ");
+        
+        // Add rotation angle
+        str.append("Rotation=").append(rotation).append("°");
+        
+        return str.append(")").toString();
     }
 }
