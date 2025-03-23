@@ -2,10 +2,8 @@ package graphics;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +25,6 @@ public class Image implements GraphicsObject {
     private String alignment = "center"; // Default alignment4
     private double rotation = 0;
     private BufferedImage original;
-    private double scale;
     /**
      * Constructs an Image object with a specified file path and position.
      * 
@@ -40,7 +37,7 @@ public class Image implements GraphicsObject {
             this.original = deepCopy(this.image);
             this.width = image.getWidth();
             this.height = image.getHeight();
-        } catch (IOException e) {a
+        } catch (IOException e) {
             e.printStackTrace();
         }
         this.position = position;
