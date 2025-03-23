@@ -25,6 +25,7 @@ public class Image implements GraphicsObject {
     private String alignment = "center"; // Default alignment4
     private double rotation = 0;
     private BufferedImage original;
+    private String filePath;
     /**
      * Constructs an Image object with a specified file path and position.
      * 
@@ -35,6 +36,7 @@ public class Image implements GraphicsObject {
         try {
             this.image = loadImage(filePath);
             this.original = deepCopy(this.image);
+            this.filePath = filePath;
             this.width = image.getWidth();
             this.height = image.getHeight();
         } catch (IOException e) {
@@ -47,6 +49,7 @@ public class Image implements GraphicsObject {
         try {
             this.image = ImageIO.read(filePath);
             this.original = deepCopy(this.image);
+            this.filePath = filePath.getFile();
             this.width = image.getWidth();
             this.height = image.getHeight();
         } catch (IOException e) {
@@ -283,5 +286,14 @@ public class Image implements GraphicsObject {
             graphics.setStroke(new BasicStroke(outlineWidth));
             graphics.drawRect(x, y, width, height);
         }
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Image(filePath=%s, position=%s, width=%d, height=%d, outlineColor=%s, " + 
+                             "outlineWidth=%d, alignment=%s, rotation=%.2f)",
+                             filePath, position.toString(), width, height, 
+                             (outlineColor != null ? outlineColor.toString() : "none"), 
+                             outlineWidth, alignment, rotation);
     }
 }
