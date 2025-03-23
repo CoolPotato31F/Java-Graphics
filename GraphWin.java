@@ -67,26 +67,88 @@ public class GraphWin extends JFrame {
      * @throws InterruptedException if interrupted during the program execution
      */
     public static void main(String[] args) throws InterruptedException {
-        // Window setup and example usage code
         GraphWin window = new GraphWin("Testing", 500, 500, false);
+        // Set the background color to cyan.
+        window.setBackground(Color.CYAN);
+        // Update the window to display the background.
+        window.update();
 
-        // Example of drawing graphical objects
+        // Draw a point.
         Point point = new Point(100, 100);
         point.draw(window);
 
+        // Draw various lines with different styles and widths.
         Line line = new Line(new Point(450, 123), new Point(350, 150));
         line.setWidth(4);
         line.setType("dashed");
         line.draw(window);
 
-        Image image = new Image(new Point(450, 420), GraphWin.class.getResource("TestImage.jpg"));
+        line = new Line(new Point(450, 133), new Point(350, 160));
+        line.setWidth(3);
+        line.setType("dotted");
+        line.draw(window);
+
+        line = new Line(new Point(450, 113), new Point(350, 140));
+        line.setWidth(3);
+        line.setType("solid");
+        line.draw(window);
+        // Load and draw an image.
+        Image image = new Image(new Point(450, 420), GraphWin.class.getResource("TestImage.jpg")); // Image initialization can take time.
         image.setScale(0.15);
         image.draw(window);
 
+        // Draw a rectangle.
+        Rectangle rect = new Rectangle(new Point(46, 200), new Point(146, 300));
+        rect.setFill(Color.BLUE);
+        rect.setWidth(3);
+        rect.draw(window);
+
+        // Draw a rotatable polygon.
+        Point[] points = {new Point(350, 230), new Point(375, 300), new Point(245, 385)};
+        RotatablePolygon poly = new RotatablePolygon(points);
+        poly.rotate(40);
+        poly.setWidth(15);
+        poly.setFill(Color.MAGENTA);
+        poly.draw(window);
+        poly.getCenter().draw(window); //draw the center of the polygon.
+
+        // Draw a circle.
+        Circle circ = new Circle(new Point(245, 180), 55);
+        circ.setFill(Color.RED);
+        circ.setWidth(3);
+        circ.draw(window);
+
+        // Draw an oval.
+        Oval oval = new Oval(new Point(30, 350), new Point(180, 450));
+        oval.setFill(Color.YELLOW);
+        oval.setWidth(10);
+        oval.setOutline(Color.BLUE);
+        oval.draw(window);
+
+        // Draw text with various formatting.
+        Text text = new Text("abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUFWXYZ\n1234567890!@#$%^&*()", new Point(250, 100));
+        text.setFill(Color.BLUE);
+        text.setOutlineWidth(4);
+        text.setOutline(Color.BLACK);
+        text.setBackground(Color.GREEN);
+        text.setBorderWidth(2);
+        text.setBorder(Color.ORANGE);
+        text.setAlignment("center");
+        text.setFont("Arial", Font.BOLD, 25);
+        text.draw(window);
+
+        // Update the window to display all drawn objects.
         window.update();
+
+        // Animation loop: rotate the polygon.
         while (window.isVisible()) {
-            System.out.println(window.getKey());
+            poly.rotate(100 * window.getDeltaTime());
+            poly.getCenter().draw(window);
+            image.rotate(100 * window.getDeltaTime());
+            window.update();
         }
+
+        // Dispose of the window resources.
         window.dispose();
     }
 
