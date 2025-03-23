@@ -184,5 +184,33 @@ public class Text implements GraphicsObject {
         graphics.setStroke(originalStroke);
         graphics.setRenderingHints(originalHints);
     }
-
+    
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder("Text(");
+        
+        // Add content
+        str.append("Content='").append(content).append("', ");
+        
+        // Add position
+        str.append("Position=").append(position.toString()).append(", ");
+        
+        // Add font details
+        str.append("Font=").append(font.getName()).append(", Size=").append(font.getSize()).append(", ");
+        
+        // Add colors
+        str.append("TextFillColor=").append(textFillColor.toString()).append(", ");
+        str.append("RectangleFillColor=").append(rectangleFillColor != null ? rectangleFillColor.toString() : "None").append(", ");
+        str.append("BorderColor=").append(borderColor.toString()).append(", ");
+        str.append("TextOutlineColor=").append(textOutlineColor.toString()).append(", ");
+        
+        // Add border width and outline width
+        str.append("BorderWidth=").append(borderWidth).append(", ");
+        str.append("TextOutlineWidth=").append(textOutlineWidth).append(", ");
+        
+        // Add alignment
+        str.append("Alignment=").append(alignment);
+        
+        return str.append(")").toString();
+    }
 }
