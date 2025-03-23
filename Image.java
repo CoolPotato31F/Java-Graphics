@@ -1,6 +1,8 @@
 package graphics;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.RescaleOp;
@@ -22,8 +24,10 @@ public class Image implements GraphicsObject {
     private GraphWin canvas;
     private Color outlineColor = null; // Outline color (null means no outline)
     private int outlineWidth = 1; // Outline thickness
-    private String alignment = "center"; // Default alignment
-
+    private String alignment = "center"; // Default alignment4
+    private double rotation = 0;
+    private BufferedImage original;
+    private double scale;
     /**
      * Constructs an Image object with a specified file path and position.
      * 
@@ -33,9 +37,10 @@ public class Image implements GraphicsObject {
     public Image(Point position, String filePath) {
         try {
             this.image = loadImage(filePath);
+            this.original = deepCopy(this.image);
             this.width = image.getWidth();
             this.height = image.getHeight();
-        } catch (IOException e) {
+        } catch (IOException e) {a
             e.printStackTrace();
         }
         this.position = position;
@@ -44,6 +49,7 @@ public class Image implements GraphicsObject {
     public Image(Point position, URL filePath) {
         try {
             this.image = ImageIO.read(filePath);
+            this.original = deepCopy(this.image);
             this.width = image.getWidth();
             this.height = image.getHeight();
         } catch (IOException e) {
@@ -62,7 +68,6 @@ public class Image implements GraphicsObject {
      */
     private BufferedImage loadImage(String filePath) throws IOException {
         File file = new File(filePath);
-        System.out.println(filePath);
         // Check if the path is absolute
         if (file.isAbsolute() && file.exists()) {
             return ImageIO.read(file);
@@ -128,8 +133,17 @@ public class Image implements GraphicsObject {
      * @param scaleFactor the scale factor (e.g., 2.0 doubles the size, 0.5 halves it)
      */
     public void setScale(double scaleFactor) {
-        this.width = (int) (image.getWidth() * scaleFactor);
-        this.height = (int) (image.getHeight() * scaleFactor);
+        this.width = (int) (original.getWidth() * scaleFactor);
+        this.height = (int) (original.getHeight() * scaleFactor);
+        BufferedImage resizedImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+
+        // Use high-quality rendering settings
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.drawImage(original, 0, 0, this.width, this.height, null);
+        g2d.dispose();
+
+        original = resizedImage;
     }
 
     /**
@@ -138,6 +152,7 @@ public class Image implements GraphicsObject {
      * 
      * @param alignment the new alignment setting
      */
+    
     public void setAlignment(String alignment) {
         if (!alignment.equals("top-left") && !alignment.equals("top-right") &&
             !alignment.equals("bottom-left") && !alignment.equals("bottom-right") &&
@@ -182,45 +197,43 @@ public class Image implements GraphicsObject {
         WritableRaster raster = img.copyData(null);
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
-    public void applyFilter(Filter filter) {
-        // Create a scaling array with three constants (RGB)
-        float[] scaleFactors = new float[3];
-        for (int i = 0; i < 3; i++) {
-            scaleFactors[i] = 1.0f + filter.getBrightness();  // Apply brightness scaling to R, G, and B
-        }
+    /**
+     * Rotates the image by a specified angle in degrees.
+     * 
+     * @param angle the angle in degrees to rotate the image
+     */
+    public void rotate(double angle) {
+        rotation += angle;
 
-        // Create the RescaleOp with the proper scaling factors for RGB channels
-        RescaleOp rescaleOp = new RescaleOp(scaleFactors, new float[]{0, 0, 0}, null);
+        double radians = Math.toRadians(rotation);
+        int origWidth = original.getWidth();
+        int origHeight = original.getHeight();
+
+        // Calculate new dimensions after rotation
+        double sin = Math.abs(Math.sin(radians));
+        double cos = Math.abs(Math.cos(radians));
+        int newWidth = (int) Math.floor(origWidth * cos + origHeight * sin);
+        int newHeight = (int) Math.floor(origWidth * sin + origHeight * cos);
+
+        // Create a new rotated image with a transparent background
+        BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = rotatedImage.createGraphics();
+
+        // Enable smooth rendering
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         
-        // Create a new image to hold the brightness-adjusted result
-        BufferedImage brightnessAdjusted = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-        Graphics2D g = brightnessAdjusted.createGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        rescaleOp.filter(brightnessAdjusted, brightnessAdjusted);
+        // Transform to rotate around center
+        AffineTransform transform = new AffineTransform();
+        transform.translate((newWidth - origWidth) / 2.0, (newHeight - origHeight) / 2.0);
+        transform.rotate(radians, origWidth / 2.0, origHeight / 2.0);
+        
+        g2d.drawImage(original, transform, null);
+        g2d.dispose();
 
-        // Now apply hue and saturation adjustments
-        for (int x = 0; x < brightnessAdjusted.getWidth(); x++) {
-            for (int y = 0; y < brightnessAdjusted.getHeight(); y++) {
-                Color originalColor = new Color(brightnessAdjusted.getRGB(x, y));
-                
-                // Convert to HSB (Hue, Saturation, Brightness) to adjust hue and saturation
-                float[] hsbValues = Color.RGBtoHSB(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), null);
-                
-                // Adjust hue and saturation
-                float hue = (hsbValues[0] + filter.getHue()) % 1.0f; // Keep hue in the range [0, 1)
-                float saturation = Math.min(1.0f, hsbValues[1] * filter.getSaturation()); // Clamp saturation to 1
-                hsbValues[0] = hue;
-                hsbValues[1] = saturation;
-
-                // Convert back to RGB and set the pixel
-                int newRGB = Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2]);
-                brightnessAdjusted.setRGB(x, y, newRGB);
-            }
-        }
-
-        // Set the adjusted image as the new image
-        this.image = brightnessAdjusted;
+        // Update image and dimensions
+        image = rotatedImage;
+        width = newWidth;
+        height = newHeight;
     }
 
     /**
