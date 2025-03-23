@@ -135,4 +135,15 @@ public class Circle implements GraphicsObject {
     public int getRadius() {
         return radius;
     }
+    
+    @Override
+    public String toString() {
+        return "Circle{" +
+               "center=" + point1 +
+               ", radius=" + radius +
+               ", outlineColor=" + outlineColor +
+               ", outlineWidth=" + width +
+               ", fillColor=" + (fillColor != null ? fillColor : "None") +
+               '}';
+    }
 }
