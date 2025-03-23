@@ -104,16 +104,6 @@ public class Rectangle implements GraphicsObject {
     }
 
     /**
-     * Returns a string representation of the rectangle.
-     * 
-     * @return A string containing the rectangle's coordinates.
-     */
-    @Override
-    public String toString() {
-        return "Rectangle(Point(" + point1.getX() + ", " + point1.getY() + "), Point(" + point2.getX() + ", " + point2.getY() + "))";
-    }
-
-    /**
      * Gets the first corner of the rectangle.
      * 
      * @return The first corner (top-left) of the rectangle.
@@ -181,46 +171,6 @@ public class Rectangle implements GraphicsObject {
         }
     }
 
-    /**
-     * Checks for a collision between a rectangle and a circle.
-     * 
-     * @param rect The rectangle.
-     * @param circle The circle.
-     * @return True if there is a collision, false otherwise.
-     */
-    public static boolean checkCollisionRectangleVsCircle(Rectangle rect, Circle circle) {
-        double left = Math.min(rect.point1.getX(), rect.point2.getX());
-        double right = Math.max(rect.point1.getX(), rect.point2.getX());
-        double top = Math.min(rect.point1.getY(), rect.point2.getY());
-        double bottom = Math.max(rect.point1.getY(), rect.point2.getY());
-
-        double cx = circle.getCenter().getX();
-        double cy = circle.getCenter().getY();
-        double radius = circle.getRadius();
-
-        double closestX = Math.max(left, Math.min(cx, right));
-        double closestY = Math.max(top, Math.min(cy, bottom));
-
-        double distanceX = cx - closestX;
-        double distanceY = cy - closestY;
-
-        return (distanceX * distanceX + distanceY * distanceY) <= (radius * radius);
-    }
-
-    /**
-     * Checks for a collision between two rectangles.
-     * 
-     * @param rect1 The first rectangle.
-     * @param rect2 The second rectangle.
-     * @return True if the rectangles collide, false otherwise.
-     */
-    public static boolean checkCollisionRectangleVsRectangle(Rectangle rect1, Rectangle rect2) {
-        return !(rect1.point2.getX() < rect2.point1.getX() ||
-                 rect1.point1.getX() > rect2.point2.getX() ||
-                 rect1.point2.getY() < rect2.point1.getY() ||
-                 rect1.point1.getY() > rect2.point2.getY());
-    }
-
     @Override
     public void drawPanel(Graphics2D graphics) {
         if (fillColor != null) {
@@ -230,5 +180,16 @@ public class Rectangle implements GraphicsObject {
         graphics.setStroke(new BasicStroke(width));
         graphics.setColor(outlineColor);
         graphics.drawRect((int) point1.getX(), (int) point1.getY(), w, h);
+    }
+    
+    @Override
+    public String toString() {
+        return "Rectangle(" +
+               "point1=" + point1 + ", " +
+               "point2=" + point2 + ", " +
+               "center=" + center + ", " +
+               "width=" + width + ", " +
+               "fillColor=" + (fillColor != null ? fillColor : "None") + ", " +
+               "outlineColor=" + outlineColor + ")";
     }
 }
