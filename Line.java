@@ -157,4 +157,10 @@ public class Line implements GraphicsObject {
         graphics.drawLine((int) point1.getX(), (int) point1.getY(), 
                           (int) point2.getX(), (int) point2.getY());
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Line(point1=%s, point2=%s, width=%d, outlineColor=%s, lineType=%s)",
+                             point1.toString(), point2.toString(), width, outlineColor.toString(), lineType);
+    }
 }
