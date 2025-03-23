@@ -4,103 +4,97 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-/**
- * Represents a line segment between two points, with customizable
- * width, outline color, and line style (solid, dotted, dashed).
- */
-public class Line implements GraphicsObject {
 
-    private Point point1;
-    private Point point2;
-    private int width = 1; // Default width
-    private Color outlineColor = Color.BLACK; // Default color
-    private String lineType = "solid"; // Default line type (solid)
-    private GraphWin canvas;
+/**
+ * Represents a polygon that can be drawn and manipulated in a graphical window.
+ */
+public class Polygon implements GraphicsObject {
+    protected Point[] points;
+    protected int width = 10; // Default stroke width
+    protected GraphWin canvas;
+    protected Color fillColor;
+    protected Color outlineColor = Color.BLACK;
 
     /**
-     * Constructs a Line between two specified points.
+     * Constructs a Polygon from an array of points.
      * 
-     * @param p1 the starting point of the line
-     * @param p2 the ending point of the line
+     * @param p Array of Points defining the polygon vertices.
+     * @throws IllegalArgumentException if the array is null or contains fewer than 3 points.
      */
-    public Line(Point p1, Point p2) {
-        this.point1 = p1;
-        this.point2 = p2;
+    public Polygon(Point[] p) {
+        if (p == null || p.length < 3) {
+            throw new IllegalArgumentException("A polygon must have at least three points.");
+        }
+        this.points = p.clone(); // Defensive copy to prevent external modifications
     }
 
     /**
-     * Sets the outline color of the line.
+     * Gets the x-coordinates of the polygon's points.
      * 
-     * @param color the new outline color
+     * @return An array of x-coordinates.
+     */
+    public int[] getXCords() {
+        int[] xCoords = new int[points.length];
+        for (int i = 0; i < points.length; i++) {
+            xCoords[i] = (int) points[i].getX();
+        }
+        return xCoords;
+    }
+
+    /**
+     * Gets the y-coordinates of the polygon's points.
+     * 
+     * @return An array of y-coordinates.
+     */
+    public int[] getYCords() {
+        int[] yCoords = new int[points.length];
+        for (int i = 0; i < points.length; i++) {
+            yCoords[i] = (int) points[i].getY();
+        }
+        return yCoords;
+    }
+    
+    /**
+     * Gets every point in the polygon
+     * 
+     * @return An array of every Points
+     */
+    public Point[] getPoints() {
+    	return points;
+    }
+    
+    /**
+     * Sets the fill color of the rectangle.
+     * 
+     * @param color The color to fill the rectangle with.
+     */
+    public void setFill(Color color) {
+        this.fillColor = color;
+    }
+
+    /**
+     * Sets the outline color of the rectangle.
+     * 
+     * @param color The outline color of the rectangle.
      */
     public void setOutline(Color color) {
         this.outlineColor = color;
     }
 
     /**
-     * Sets the first point of the line.
+     * Sets the width of the rectangle's outline.
      * 
-     * @param point the new first point
-     */
-    public void setP1(Point point) {
-        this.point1 = point;
-    }
-
-    /**
-     * Sets the second point of the line.
-     * 
-     * @param point the new second point
-     */
-    public void setP2(Point point) {
-        this.point2 = point;
-    }
-
-    /**
-     * Gets the width (thickness) of the line.
-     * 
-     * @return the width of the line
-     */
-    public int getWidth() {
-        return this.width;
-    }
-
-    /**
-     * Sets the width (thickness) of the line.
-     * 
-     * @param width the new width of the line
+     * @param width The width of the outline.
      */
     public void setWidth(int width) {
         this.width = width;
     }
 
     /**
-     * Sets the type of the line (solid, dotted, or dashed).
+     * Draws the polygon on the provided `GraphWin` canvas.
      * 
-     * @param type the type of the line ("solid", "dotted", or "dashed")
-     */
-    public void setType(String type) {
-        if (type.equals("solid") || type.equals("dotted") || type.equals("dashed")) {
-            this.lineType = type;
-        } else {
-            throw new IllegalArgumentException("Invalid line type: " + type);
-        }
-    }
-
-    /**
-     * Calculates and returns the length of the line.
-     * 
-     * @return the length of the line
-     */
-    public double getLength() {
-        return Math.sqrt(Math.pow(point1.getX() - point2.getX(), 2) +
-                         Math.pow(point1.getY() - point2.getY(), 2));
-    }
-
-    /**
-     * Draws the line on the provided graphical window.
-     * 
-     * @param canvas the {@code GraphWin} where the line will be drawn
-     * @throws IllegalStateException if the object is already drawn
+     * @param canvas The `GraphWin` instance.
+     * @throws IllegalStateException if the polygon is already drawn.
      */
     @Override
     public void draw(GraphWin canvas) {
@@ -115,7 +109,7 @@ public class Line implements GraphicsObject {
     }
 
     /**
-     * Removes the line from the graphical window.
+     * Removes the polygon from the graphical window.
      */
     @Override
     public void undraw() {
@@ -129,38 +123,36 @@ public class Line implements GraphicsObject {
     }
 
     /**
-     * Draws the line on a {@code Graphics2D} panel.
+     * Renders the polygon onto a `Graphics2D` panel.
      * 
-     * @param graphics the {@code Graphics2D} object used for rendering
+     * @param graphics The `Graphics2D` object used for rendering.
      */
     @Override
     public void drawPanel(Graphics2D graphics) {
-        BasicStroke stroke = null;
-        
-        // Adjust the dash pattern based on lineType
-        if (lineType.equals("solid")) {
-            stroke = new BasicStroke(width);
-        } else if (lineType.equals("dotted")) {
-            // Ensure the gap between dots is adjusted based on width
-            float dashLength = 1f; // Length of dashes
-            float gapLength = width*2f;  // Gap between dashes/dots
-            stroke = new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[] {dashLength, gapLength}, 0.0f);
-        } else if (lineType.equals("dashed")) {
-            float dashLength = width*3f; // Length of dashes
-            float gapLength = width*1.5f;  // Gap between dashes/dots
-            // Ensure the gap between dashes is adjusted based on width
-            stroke = new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[] {dashLength, gapLength}, 0.0f);
+        int[] xCoords = getXCords();
+        int[] yCoords = getYCords();
+
+        if (fillColor != null) {
+            graphics.setColor(fillColor);
+            graphics.fillPolygon(xCoords, yCoords, points.length);
         }
 
-        graphics.setStroke(stroke);
+        graphics.setStroke(new BasicStroke(width));
         graphics.setColor(outlineColor);
-        graphics.drawLine((int) point1.getX(), (int) point1.getY(), 
-                          (int) point2.getX(), (int) point2.getY());
+        graphics.drawPolygon(xCoords, yCoords, points.length);
     }
     
     @Override
     public String toString() {
-        return String.format("Line(point1=%s, point2=%s, width=%d, outlineColor=%s, lineType=%s)",
-                             point1.toString(), point2.toString(), width, outlineColor.toString(), lineType);
+        StringBuilder str = new StringBuilder("Polygon(");
+        for (int i = 0; i < points.length; i++) {
+            str.append(points[i].toString());
+            if (i < points.length - 1) {
+                str.append(", ");
+            }
+        }
+        str.append(")");
+        return str.toString();
     }
+
 }
