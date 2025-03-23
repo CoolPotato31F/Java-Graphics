@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Kaiser Fechner
@@ -59,6 +60,7 @@ public class GraphWin extends JFrame {
     private int lastKey = -1;
     public boolean redraw = false;
     private final ArrayList<Integer> keysPressed = new ArrayList<Integer>();
+    private boolean mousePressed = false;
 
     /**
      * Main method that demonstrates usage of GraphWin.
@@ -168,9 +170,8 @@ public class GraphWin extends JFrame {
         height = h;
         autoflush = Autoflush;
         setVisible(true);
-        preferedX = super.getPreferredSize().width + 1;
-        preferedY = super.getPreferredSize().height + 1;
-        setSize(preferedX + w, preferedY + h);
+        Insets insets = getInsets();
+        setSize(insets.left + insets.right + w, insets.top + insets.bottom + h);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.panel = new Panel();
@@ -183,6 +184,20 @@ public class GraphWin extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 latch.countDown();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = false;
+                }
             }
         });
 
@@ -208,7 +223,8 @@ public class GraphWin extends JFrame {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                mousePosition = new Point(e.getX() - preferedX / 2, e.getY() - preferedY / 2);
+                Insets insets = getInsets();
+                mousePosition = new Point(e.getX() - insets.left, e.getY() - insets.top);
             }
         });
 
@@ -231,9 +247,8 @@ public class GraphWin extends JFrame {
         height = h;
         autoflush = false;
         setVisible(true);
-        preferedX = super.getPreferredSize().width + 1;
-        preferedY = super.getPreferredSize().height + 1;
-        setSize(preferedX + w, preferedY + h);
+        Insets insets = getInsets();
+        setSize(insets.left + insets.right + w, insets.top + insets.bottom + h);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         panel = new Panel();
@@ -246,6 +261,20 @@ public class GraphWin extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 latch.countDown();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = false;
+                }
             }
         });
 
@@ -270,7 +299,8 @@ public class GraphWin extends JFrame {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                mousePosition = new Point(e.getX() - preferedX / 2, e.getY() - preferedY / 2);
+                Insets insets = getInsets();
+                mousePosition = new Point(e.getX() - insets.left, e.getY() - insets.top);
             }
         });
 
@@ -325,12 +355,21 @@ public class GraphWin extends JFrame {
      * 
      * @return a Point object representing the current mouse position
      */
-    public Point getMouse() {
+    public boolean getMouse() {
         try {
             latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return true;
+    }
+    
+    /**
+     * Returns the current position of the mouse as a Point.
+     * 
+     * @return the current mouse position
+     */
+    public Point getCurrentMousePosition() {
         return mousePosition;
     }
 
@@ -358,14 +397,13 @@ public class GraphWin extends JFrame {
     }
 
     /**
-     * Checks and returns the current position of the mouse without waiting for a click.
+     * Checks if the left mouse button is being held down.
      * 
-     * @return the current mouse position
+     * @return true if the left mouse button is pressed, false otherwise
      */
-    public Point checkMouse() {
-        return mousePosition;
+    public boolean checkMouse() {
+        return mousePressed;
     }
-
     /**
      * @return the current width of the GraphWin object
      */
@@ -422,15 +460,18 @@ public class GraphWin extends JFrame {
      * Updates the window by calculating delta time and forcing a repaint.
      */
     public void update() {
-    	redraw = true;
+        redraw = true;
         if (lastTime == 0) {
             lastTime = System.nanoTime();
         }
         deltaTime = (System.nanoTime() - lastTime) / 1_000_000_000.0;
         lastTime = System.nanoTime();
-        panel.repaint();
+        
+        SwingUtilities.invokeLater(() -> {
+            panel.repaint();
+        });
+
         Toolkit.getDefaultToolkit().sync();
-    	redraw = false;
     }
 
     /**
