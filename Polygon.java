@@ -90,15 +90,6 @@ public class Polygon implements GraphicsObject {
         this.width = width;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder("Polygon(");
-        for (Point p : points) {
-            str.append(p.toString()).append(", ");
-        }
-        return str.append(")").toString();
-    }
-
     /**
      * Draws the polygon on the provided `GraphWin` canvas.
      * 
@@ -150,4 +141,18 @@ public class Polygon implements GraphicsObject {
         graphics.setColor(outlineColor);
         graphics.drawPolygon(xCoords, yCoords, points.length);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder("Polygon(");
+        for (int i = 0; i < points.length; i++) {
+            str.append(points[i].toString());
+            if (i < points.length - 1) {
+                str.append(", ");
+            }
+        }
+        str.append(")");
+        return str.toString();
+    }
+
 }
