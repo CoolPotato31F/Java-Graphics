@@ -1,19 +1,15 @@
 package graphics;
 
 import java.util.*;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import javax.swing.*;
-
-import java.awt.event.KeyEvent;
-import java.awt.Graphics2D;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.concurrent.CountDownLatch;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * @author Kaiser Fechner
@@ -83,7 +79,6 @@ public class GraphWin extends JFrame {
         line.setType("dashed");
         line.draw(window);
 
-        Filter filter = new Filter(0.1f, 1f, 0f);
         Image image = new Image(new Point(450, 420), GraphWin.class.getResource("TestImage.jpg"));
         image.setScale(0.15);
         image.draw(window);
