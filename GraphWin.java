@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
@@ -48,8 +49,6 @@ public class GraphWin extends JFrame {
 
     private int width;
     private int height;
-    private int preferedX;
-    private int preferedY;
     public Panel panel;
     private ArrayList<GraphicsObject> items;
     public boolean autoflush;
@@ -73,7 +72,7 @@ public class GraphWin extends JFrame {
         // Set the background color to cyan.
         window.setBackground(Color.CYAN);
         // Update the window to display the background.
-        window.update();
+        
 
         // Draw a point.
         Point point = new Point(100, 100);
@@ -145,10 +144,10 @@ public class GraphWin extends JFrame {
         // Animation loop: rotate the polygon.
         while (window.isVisible()) {
             poly.rotate(100 * window.getDeltaTime());
-            poly.getCenter().draw(window);
             image.rotate(100 * window.getDeltaTime());
             window.setTitle("FPS: "+Math.round(1/window.getDeltaTime()));
             window.update();
+            System.out.println(window.getItems());
         }
 
         // Dispose of the window resources.
@@ -455,6 +454,16 @@ public class GraphWin extends JFrame {
     public void addItem(GraphicsObject object) {
         items.add(object);
     }
+    
+
+    /**
+     * Returns all objects drawn on the window;
+     *  
+     * @return Array of all items in the window
+     */
+    public ArrayList<GraphicsObject> getItems() {
+        return items;
+    }
 
     /**
      * Updates the window by calculating delta time and forcing a repaint.
@@ -490,5 +499,17 @@ public class GraphWin extends JFrame {
      */
     public ArrayList<Integer> checkKeys() {
         return new ArrayList<>(keysPressed);
+    }
+    
+    public void help() {
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            if (Desktop.isDesktopSupported() && desktop.isSupported(Desktop.Action.BROWSE)) {
+            	System.out.println("Opening Java Graphics Wiki...");
+                desktop.browse(new URI("https://github.com/CoolPotato31F/Java-Graphics/wiki"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
