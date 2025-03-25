@@ -147,7 +147,6 @@ public class GraphWin extends JFrame {
             image.rotate(100 * window.getDeltaTime());
             window.setTitle("FPS: "+Math.round(1/window.getDeltaTime()));
             window.update();
-            System.out.println(window.getItems());
         }
 
         // Dispose of the window resources.
