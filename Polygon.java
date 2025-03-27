@@ -151,15 +151,15 @@ public class Polygon implements GraphicsObject {
     }
     private double applyEasing(double t, EasingStyle style, EasingDirection easingDirection) {
         switch (easingDirection) {
-            case Out:
+            case OUT:
                 // Reverse the easing by applying (1 - easing(1 - t))
-                return 1 - applyEasing(1 - t, style, EasingDirection.In);
-            case InOut:
+                return 1 - applyEasing(1 - t, style, EasingDirection.IN);
+            case INOUT:
                 // First half uses In, second half uses Out
                 return t < 0.5 
-                    ? applyEasing(t * 2, style, EasingDirection.In) / 2 
-                    : 1 - applyEasing((1 - t) * 2, style, EasingDirection.In) / 2;
-            case In:
+                    ? applyEasing(t * 2, style, EasingDirection.IN) / 2 
+                    : 1 - applyEasing((1 - t) * 2, style, EasingDirection.IN) / 2;
+            case IN:
             default:
                 // Normal easing behavior
                 switch (style) {
@@ -281,9 +281,6 @@ public class Polygon implements GraphicsObject {
         }
         this.canvas = canvas;
         canvas.addItem(this);
-        if (canvas.autoflush) {
-            canvas.update();
-        }
     }
 
     /**
@@ -293,9 +290,6 @@ public class Polygon implements GraphicsObject {
     public void undraw() {
         if (canvas != null) {
             canvas.deleteItem(this);
-            if (canvas.autoflush) {
-                canvas.update();
-            }
             this.canvas = null;
         }
     }
