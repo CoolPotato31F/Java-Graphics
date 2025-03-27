@@ -1,5 +1,5 @@
 package graphics;
 
 public enum EasingDirection {
-	In, Out, InOut
+	IN, OUT, INOUT
 }
