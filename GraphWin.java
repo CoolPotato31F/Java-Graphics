@@ -243,7 +243,7 @@ public class GraphWin extends JFrame {
         items = new ArrayList<GraphicsObject>();
         width = w;
         height = h;
-        autoflush = false;
+        autoflush = true;
         setVisible(true);
         Insets insets = getInsets();
         setSize(insets.left + insets.right + w, insets.top + insets.bottom + h);
@@ -428,7 +428,7 @@ public class GraphWin extends JFrame {
     	if (this.panel != null) {
     		super.setBackground(clr);
         	this.panel.setBackground(clr);
-        	if (autoflush) {
+        	if (autoflush==true) {
         		update();
         	}
     	} else { // Forced to do this because this function gets called on GraphWin initialization
@@ -443,6 +443,9 @@ public class GraphWin extends JFrame {
      */
     public void deleteItem(GraphicsObject object) {
         items.remove(object);
+        if (autoflush==true) {
+        	update();
+        }
     }
 
     /**
@@ -452,6 +455,9 @@ public class GraphWin extends JFrame {
      */
     public void addItem(GraphicsObject object) {
         items.add(object);
+        if (autoflush==true) {
+        	update();
+        }
     }
     
 
@@ -476,7 +482,8 @@ public class GraphWin extends JFrame {
         lastTime = System.nanoTime();
         
         SwingUtilities.invokeLater(() -> {
-            panel.repaint();
+            panel.paintImmediately(0, 0, width, height);
+            redraw = false;
         });
 
         Toolkit.getDefaultToolkit().sync();
